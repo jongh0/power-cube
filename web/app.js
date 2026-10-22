@@ -1,68 +1,109 @@
-// Vercel 배포 후 실제 주소로 교체 (예: https://power-cube-xxxx.vercel.app)
+// Vercel 배포 주소
 const API_URL = 'https://power-cube-ten.vercel.app/api/status';
-const MIN_INTERVAL_MS = 30_000;
+const AUTO_REFRESH_MIN_MS = 10_000; // 탭 복귀 시 최소 10초 지난 경우 자동 갱신
+const MANUAL_THROTTLE_MS = 2_000;   // 새로고침 버튼 연타 방지 (2초)
 
 const $ = (id) => document.getElementById(id);
-let lastFetch = 0;
+let lastFetchTime = 0;
 let lastData = null;
-let loading = false;
+let isLoading = false;
 
-function render(data, stale) {
+function render(data, stale = false) {
   $('name').textContent = data.stationName || '충전 상태';
   $('addr').textContent = data.address || '';
 
-  const s = data.summary;
-  $('summary').hidden = false;
-  $('summary').textContent = `충전가능 ${s.available} / 전체 ${s.total}  (충전중 ${s.charging})`;
+  const s = data.summary || { available: 0, charging: 0, total: 0 };
+  $('summary-card').hidden = false;
+  $('stat-available').textContent = s.available;
+  $('stat-charging').textContent = s.charging;
+  $('stat-total').textContent = s.total;
 
   const list = $('list');
   list.replaceChildren();
-  for (const g of data.groups) {
+
+  const groups = data.groups || [];
+  for (const g of groups) {
     const li = document.createElement('li');
     li.className = `row ${g.code}`;
+    
     const gs = document.createElement('span');
     gs.className = 'g';
     gs.textContent = g.group;
+    
     const ss = document.createElement('span');
     ss.className = 's';
     ss.textContent = g.status;
+    
     li.append(gs, ss);
     list.append(li);
   }
 
-  const t = new Date(data.fetchedAt).toLocaleTimeString('ko-KR');
-  $('updated').textContent = `마지막 갱신 ${t}${stale ? ' (오래된 데이터)' : ''}`;
+  const dateObj = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
+  const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  $('updated').textContent = `마지막 갱신: ${timeStr}${stale ? ' (오래된 데이터)' : ''}`;
 }
 
 function showMsg(text) {
-  $('msg').hidden = !text;
-  $('msg').textContent = text || '';
+  const el = $('msg');
+  el.hidden = !text;
+  el.textContent = text || '';
 }
 
-async function load() {
-  if (loading) return;
-  loading = true;
-  $('refresh').disabled = true;
+async function loadData(isManual = false) {
+  const now = Date.now();
+  if (isLoading) return;
+  if (isManual && now - lastFetchTime < MANUAL_THROTTLE_MS) return;
+
+  isLoading = true;
+  const btn = $('fab-refresh');
+  const btnText = btn.querySelector('.fab-text');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  if (btnText) btnText.textContent = '조회 중…';
+
   try {
-    const res = await fetch(API_URL);
+    // 캐시 방지를 위해 타임스탬프 쿼리 및 no-cache 헤더 전송
+    const url = `${API_URL}?_t=${now}`;
+    const res = await fetch(url, {
+      cache: 'no-cache',
+      headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || `서버 응답 오류 (${res.status})`);
+    }
+
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || '불러오지 못했어요');
     lastData = data;
-    lastFetch = Date.now();
+    lastFetchTime = Date.now();
     showMsg('');
     render(data, false);
   } catch (e) {
-    showMsg(`불러오지 못했어요. ${e.message || ''}`.trim());
-    if (lastData) render(lastData, true);
-    else $('updated').textContent = '불러오기 실패';
+    console.error('데이터 조회 실패:', e);
+    showMsg(`불러오지 못했습니다: ${e.message}`);
+    if (lastData) {
+      render(lastData, true);
+    } else {
+      $('updated').textContent = '데이터를 가져올 수 없습니다.';
+    }
   } finally {
-    loading = false;
-    $('refresh').disabled = false;
+    isLoading = false;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    if (btnText) btnText.textContent = '새로고침';
   }
 }
 
-$('refresh').addEventListener('click', load);
+// 이벤트 리스너 설정
+$('fab-refresh').addEventListener('click', () => loadData(true));
+
+// 화면으로 돌아왔을 때 10초 이상 지났으면 자동 새로고침
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && Date.now() - lastFetch > MIN_INTERVAL_MS) load();
+  if (document.visibilityState === 'visible' && Date.now() - lastFetchTime > AUTO_REFRESH_MIN_MS) {
+    loadData(false);
+  }
 });
-load();
+
+// 첫 실행
+loadData(false);

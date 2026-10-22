@@ -4,23 +4,56 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#16a34a">
-  <title>충전 상태</title>
-  <link rel="stylesheet" href="style.css">
+  <title>충전 상태 - 광교중흥S클래스</title>
+  <link rel="stylesheet" href="style.css?v=1.2.0">
 </head>
 <body>
   <main>
     <header>
-      <h1 id="name">충전 상태</h1>
+      <div class="header-main">
+        <h1 id="name">충전 상태</h1>
+        <span id="badge" class="badge">실시간</span>
+      </div>
       <p id="addr"></p>
     </header>
-    <div id="summary" class="summary" hidden></div>
+
+    <section id="summary-card" class="summary-card" hidden>
+      <div class="summary-numbers">
+        <div class="stat available">
+          <span class="label">충전 가능</span>
+          <span id="stat-available" class="val">-</span>
+        </div>
+        <div class="stat charging">
+          <span class="label">충전 중</span>
+          <span id="stat-charging" class="val">-</span>
+        </div>
+        <div class="stat total">
+          <span class="label">전체 콘센트</span>
+          <span id="stat-total" class="val">-</span>
+        </div>
+      </div>
+      <div class="summary-footer">
+        <span id="updated">불러오는 중…</span>
+      </div>
+    </section>
+
     <div id="msg" class="msg" hidden></div>
+    
     <ul id="list" class="list"></ul>
+
     <footer>
-      <span id="updated">불러오는 중…</span>
-      <button id="refresh" type="button">새로고침</button>
+      <p class="copyright">파워큐브 이동형 충전기 현황 • 광교중흥S클래스</p>
     </footer>
   </main>
-  <script type="module" src="app.js"></script>
+
+  <!-- 우측 하단 플로팅 새로고침 버튼 -->
+  <button id="fab-refresh" class="fab-refresh" type="button" aria-label="새로고침">
+    <svg class="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/>
+    </svg>
+    <span class="fab-text">새로고침</span>
+  </button>
+
+  <script type="module" src="app.js?v=1.2.0"></script>
 </body>
 </html>
