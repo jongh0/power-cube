@@ -3,6 +3,10 @@ const API_URL = 'https://power-cube-ten.vercel.app/api/status';
 const AUTO_REFRESH_MIN_MS = 10_000; // 탭 복귀 시 최소 10초 지난 경우 자동 갱신
 const MANUAL_THROTTLE_MS = 2_000;   // 새로고침 버튼 연타 방지 (2초)
 
+// ⭐ 사용자가 자주 사용하는 충전기 그룹 목록
+const FAVORITE_GROUPS = ['AG', 'AH', 'AN', 'AO', 'AQ', 'AR', 'AT'];
+const FAVORITE_SET = new Set(FAVORITE_GROUPS);
+
 const $ = (id) => document.getElementById(id);
 let lastFetchTime = 0;
 let lastData = null;
@@ -18,23 +22,85 @@ function render(data, stale = false) {
   $('stat-charging').textContent = s.charging;
   $('stat-total').textContent = s.total;
 
+  const groups = data.groups || [];
+  const groupMap = new Map(groups.map((g) => [g.group, g]));
+
+  // 1. ⭐ 자주 쓰는 충전기 섹션 렌더링
+  const favGrid = $('fav-grid');
+  favGrid.replaceChildren();
+  let favAvailableCount = 0;
+
+  for (const favName of FAVORITE_GROUPS) {
+    const item = groupMap.get(favName) || { group: favName, status: '알 수 없음', code: 'unknown' };
+    if (item.code === 'available') {
+      favAvailableCount++;
+    }
+
+    const card = document.createElement('div');
+    const isAvail = item.code === 'available';
+    const isCharge = item.code === 'charging';
+    card.className = `fav-card ${isAvail ? 'available' : isCharge ? 'charging' : 'other'}`;
+
+    const topDiv = document.createElement('div');
+    topDiv.className = 'fav-top';
+
+    const gSpan = document.createElement('span');
+    gSpan.className = 'fav-group';
+    gSpan.textContent = item.group;
+
+    const starSpan = document.createElement('span');
+    starSpan.className = 'mini-star';
+    starSpan.textContent = '★';
+
+    topDiv.append(gSpan, starSpan);
+
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'fav-status';
+
+    const dot = document.createElement('span');
+    dot.className = 'status-dot';
+
+    const sSpan = document.createElement('span');
+    sSpan.textContent = item.status;
+
+    statusDiv.append(dot, sSpan);
+    card.append(topDiv, statusDiv);
+    favGrid.append(card);
+  }
+
+  $('fav-section').hidden = false;
+  $('fav-summary').textContent = `${favAvailableCount} / ${FAVORITE_GROUPS.length} 가능`;
+
+  // 2. 전체 목록 렌더링
   const list = $('list');
   list.replaceChildren();
+  $('total-count-badge').textContent = `${groups.length}개`;
 
-  const groups = data.groups || [];
   for (const g of groups) {
+    const isFav = FAVORITE_SET.has(g.group);
     const li = document.createElement('li');
-    li.className = `row ${g.code}`;
-    
+    li.className = `row ${g.code} ${isFav ? 'is-fav' : ''}`;
+
+    const gWrap = document.createElement('span');
+    gWrap.className = 'g-wrap';
+
     const gs = document.createElement('span');
     gs.className = 'g';
     gs.textContent = g.group;
-    
+    gWrap.append(gs);
+
+    if (isFav) {
+      const star = document.createElement('span');
+      star.className = 'star-badge';
+      star.textContent = '★';
+      gWrap.append(star);
+    }
+
     const ss = document.createElement('span');
     ss.className = 's';
     ss.textContent = g.status;
-    
-    li.append(gs, ss);
+
+    li.append(gWrap, ss);
     list.append(li);
   }
 
@@ -62,7 +128,6 @@ async function loadData(isManual = false) {
   if (btnText) btnText.textContent = '조회 중…';
 
   try {
-    // 캐시 방지를 위해 타임스탬프 쿼리 및 no-cache 헤더 전송
     const url = `${API_URL}?_t=${now}`;
     const res = await fetch(url, {
       cache: 'no-cache',

@@ -8,11 +8,15 @@
   --primary-hover: #15803d;
   --available: #16a34a;
   --available-bg: #f0fdf4;
+  --available-border: #86efac;
   --charging: #dc2626;
   --charging-bg: #fef2f2;
+  --charging-border: #fca5a5;
   --maintenance: #d97706;
   --unavailable: #64748b;
   --unknown: #94a3b8;
+  --star: #f59e0b;
+  --fav-row-bg: rgba(245, 158, 11, 0.06);
   --fab-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
@@ -24,7 +28,10 @@
     --sub: #94a3b8;
     --line: #334155;
     --available-bg: rgba(22, 163, 74, 0.15);
+    --available-border: rgba(22, 163, 74, 0.4);
     --charging-bg: rgba(220, 38, 38, 0.15);
+    --charging-border: rgba(220, 38, 38, 0.4);
+    --fav-row-bg: rgba(245, 158, 11, 0.12);
     --fab-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   }
 }
@@ -43,35 +50,6 @@ main {
   max-width: 520px;
   margin: 0 auto;
   padding: 20px 16px 100px; /* 플로팅 버튼 여백 */
-}
-
-/* 태블릿 및 PC 화면 확장: 2열 그리드로 전환 */
-@media (min-width: 680px) {
-  main {
-    max-width: 760px;
-    padding: 32px 24px 100px;
-  }
-  .list {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    background: transparent !important;
-    border: none !important;
-  }
-  .list .row {
-    background: var(--card);
-    border: 1px solid var(--line) !important;
-    border-radius: 10px;
-  }
-}
-
-@media (min-width: 1024px) {
-  main {
-    max-width: 960px;
-  }
-  .list {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
 }
 
 /* Header */
@@ -109,7 +87,7 @@ header p {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 .summary-numbers {
@@ -146,18 +124,132 @@ header p {
   text-align: right;
 }
 
-/* Message banner */
-.msg {
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  border-radius: 12px;
-  background: #fef3c7;
-  color: #92400e;
-  font-size: 14px;
-  font-weight: 500;
+/* Section Header */
+.section-block {
+  margin-bottom: 24px;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+.icon-star {
+  color: var(--star);
+  font-size: 16px;
+}
+.fav-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--available-bg);
+  color: var(--available);
+  border: 1px solid var(--available-border);
+}
+.count-badge {
+  font-size: 12px;
+  color: var(--sub);
+  font-weight: 600;
 }
 
-/* List & Rows */
+/* ⭐ 자주 쓰는 충전기 카드 그리드 */
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 440px) {
+  .fav-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 768px) {
+  .fav-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.fav-card {
+  position: relative;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 12px;
+  border: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 86px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.fav-card:hover {
+  transform: translateY(-2px);
+}
+.fav-card .fav-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fav-card .fav-group {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.fav-card .mini-star {
+  color: var(--star);
+  font-size: 13px;
+}
+.fav-card .fav-status {
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fav-card .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* 자주 쓰는 충전기: 충전 가능일 때 특별 강조 (에메랄드빛) */
+.fav-card.available {
+  background: var(--available-bg);
+  border-color: var(--available);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.12);
+}
+.fav-card.available .fav-status {
+  color: var(--available);
+}
+
+/* 자주 쓰는 충전기: 충전 중일 때 */
+.fav-card.charging {
+  background: var(--charging-bg);
+  border-color: var(--charging-border);
+}
+.fav-card.charging .fav-status {
+  color: var(--charging);
+}
+
+.fav-card.other .fav-status {
+  color: var(--sub);
+}
+
+/* 전체 목록 (List & Rows) */
 .list {
   list-style: none;
   margin: 0;
@@ -174,7 +266,6 @@ header p {
   padding: 0 16px;
   border-bottom: 1px solid var(--line);
   font-size: 16px;
-  transition: background 0.15s ease;
 }
 .row:last-child {
   border-bottom: 0;
@@ -194,8 +285,13 @@ header p {
 .row.unavailable { color: var(--unavailable); }
 .row.unknown { color: var(--unknown); }
 
+.row .g-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 70px;
+}
 .row .g {
-  width: 60px;
   font-weight: 700;
   color: var(--text);
 }
@@ -204,11 +300,65 @@ header p {
   color: var(--sub);
   font-weight: 400;
 }
+.row .star-badge {
+  color: var(--star);
+  font-size: 11px;
+}
 .row .s {
   font-weight: 700;
   color: inherit;
   margin-left: auto;
   font-size: 15px;
+}
+
+/* 전체 목록 내 자주 쓰는 항목 강조 행 */
+.row.is-fav {
+  background: var(--fav-row-bg);
+  border-left: 3px solid var(--star);
+  padding-left: 13px; /* border-left 두께 보정 */
+}
+
+/* 태블릿 및 PC 화면 확장: 전체 목록 2~3열 그리드 */
+@media (min-width: 680px) {
+  main {
+    max-width: 760px;
+    padding: 32px 24px 100px;
+  }
+  .list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border: none !important;
+  }
+  .list .row {
+    background: var(--card);
+    border: 1px solid var(--line) !important;
+    border-radius: 10px;
+  }
+  .list .row.is-fav {
+    background: var(--fav-row-bg);
+    border-left: 3px solid var(--star) !important;
+  }
+}
+@media (min-width: 1024px) {
+  main {
+    max-width: 960px;
+  }
+  .list {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Message banner */
+.msg {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* Footer info */
