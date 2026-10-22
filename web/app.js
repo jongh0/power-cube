@@ -1,5 +1,5 @@
 // Vercel 배포 후 실제 주소로 교체 (예: https://power-cube-xxxx.vercel.app)
-const API_URL = 'https://REPLACE_ME.vercel.app/api/status';
+const API_URL = 'https://power-cube-ten.vercel.app/api/status';
 const MIN_INTERVAL_MS = 30_000;
 
 const $ = (id) => document.getElementById(id);
