@@ -128,11 +128,9 @@ async function loadData(isManual = false) {
   if (btnText) btnText.textContent = '조회 중…';
 
   try {
+    // 타임스탬프 쿼리로 브라우저 캐시를 무효화 (Simple Request로 Preflight 없이 즉시 호출)
     const url = `${API_URL}?_t=${now}`;
-    const res = await fetch(url, {
-      cache: 'no-cache',
-      headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
-    });
+    const res = await fetch(url);
 
     if (!res.ok) {
       const errJson = await res.json().catch(() => ({}));
