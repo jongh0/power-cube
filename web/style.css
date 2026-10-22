@@ -1,0 +1,30 @@
+:root { --bg:#f5f6f8; --card:#fff; --text:#111827; --sub:#6b7280; --line:#e5e7eb; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111827; --card:#1f2937; --text:#f9fafb; --sub:#9ca3af; --line:#374151; }
+}
+* { box-sizing: border-box; }
+body { margin:0; font:16px/1.4 system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif; background:var(--bg); color:var(--text); }
+main { max-width:480px; margin:0 auto; padding:16px 16px 32px; }
+h1 { margin:0; font-size:20px; }
+header p { margin:4px 0 12px; color:var(--sub); font-size:13px; }
+.summary { padding:12px 14px; margin-bottom:12px; background:var(--card); border-radius:12px; font-weight:600; border:1px solid var(--line); }
+.msg { padding:12px 14px; margin-bottom:12px; border-radius:12px; background:#fef3c7; color:#92400e; font-size:14px; }
+.list { list-style:none; margin:0; padding:0; background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.row { display:flex; align-items:center; min-height:48px; padding:0 16px; border-bottom:1px solid var(--line); font-size:18px; }
+.row:last-child { border-bottom:0; }
+.row .g { width:56px; font-weight:700; }
+.row .g::after { content:" :"; color:var(--sub); font-weight:400; }
+.row .s { font-weight:600; }
+.row.available .s { color:#16a34a; }
+.row.charging .s { color:#dc2626; }
+.row.maintenance .s { color:#d97706; }
+.row.unavailable .s { color:#6b7280; }
+.row.unknown .s { color:#9ca3af; }
+.row::before { content:""; width:10px; height:10px; border-radius:50%; margin-right:12px; background:currentColor; }
+.row.available { color:#16a34a; } .row.charging { color:#dc2626; } .row.maintenance { color:#d97706; }
+.row.unavailable { color:#6b7280; } .row.unknown { color:#9ca3af; }
+.row .g, .row .s { color:inherit; }
+.row .g { color:var(--text); }
+footer { display:flex; justify-content:space-between; align-items:center; margin-top:14px; color:var(--sub); font-size:13px; }
+button { font:inherit; padding:10px 16px; border:0; border-radius:10px; background:#16a34a; color:#fff; font-weight:600; }
+button:disabled { opacity:.5; }
