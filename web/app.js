@@ -106,7 +106,7 @@ function render(data, stale = false) {
 
   const dateObj = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
   const timeStr = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  $('updated').textContent = `마지막 갱신: ${timeStr}${stale ? ' (오래된 데이터)' : ''}`;
+  $('updated').textContent = `갱신: ${timeStr}${stale ? ' (지연)' : ''}`;
 }
 
 function showMsg(text) {
