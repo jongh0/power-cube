@@ -4,7 +4,7 @@ const AUTO_REFRESH_MIN_MS = 10_000; // 탭 복귀 시 최소 10초 지난 경우
 const MANUAL_THROTTLE_MS = 2_000;   // 새로고침 버튼 연타 방지 (2초)
 
 // ⭐ 사용자가 자주 사용하는 충전기 그룹 목록
-const FAVORITE_GROUPS = ['AG', 'AH', 'AN', 'AO', 'AQ', 'AR', 'AT'];
+const FAVORITE_GROUPS = ['AG', 'AH', 'AN', 'AO', 'AQ', 'AR', 'AT', 'M'];
 const FAVORITE_SET = new Set(FAVORITE_GROUPS);
 
 const $ = (id) => document.getElementById(id);
