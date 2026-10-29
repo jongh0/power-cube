@@ -1,0 +1,25 @@
+{
+  "name": "광교중흥S클래스 파워큐브 충전 현황",
+  "short_name": "파워큐브",
+  "description": "광교중흥S클래스 아파트 파워큐브 이동형 충전기 실시간 사용 현황",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
