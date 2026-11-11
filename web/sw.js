@@ -1,9 +1,9 @@
-const CACHE_NAME = 'powercube-cache-v1.4.2';
+const CACHE_NAME = 'powercube-cache-v1.5.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './style.css?v=1.4.2',
-  './app.js?v=1.4.2',
+  './style.css?v=1.5.0',
+  './app.js?v=1.5.0',
   './manifest.json',
   './icons/icon-180.png',
   './icons/icon-192.png',
